@@ -59,7 +59,7 @@ class SAMHESS(torch.optim.Optimizer):
                 if p.grad is None: continue
                 param_state = self.state[p]
                 
-                e_w = (torch.pow(p, 2) if group['adaptive'] else 1.0) * p.grad * scale.to(p)
+                e_w = (torch.pow(p, 2) if group['adaptive'] else 1.0) * param_state['d_t'] * scale.to(p)
                 p.add_(e_w)  # climb to the local maximum "w + e(w)"
                 
                 param_state['e_w'] = e_w.clone()
