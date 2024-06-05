@@ -2,10 +2,12 @@ abstract: The gradient magnitude is a crucial factor in determining the ability 
 authors:
   - family-names: Luong
     given-names: Hoang-Chau
-    orcid: ""
 cff-version: 1.2.0
 preferred-citation: 
   type: report
+  authors:
+  - family-names: Luong
+    given-names: Hoang-Chau
 date-released: "2024-06-05"
 keywords:
   - research
