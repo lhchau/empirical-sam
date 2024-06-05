@@ -28,6 +28,7 @@ class SAM(torch.optim.Optimizer):
                 e_w = (torch.pow(p, 2) if group["adaptive"] else 1.0) * p.grad * scale
                 p.add_(e_w)  # climb to the local maximum "w + e(w)"
                 
+                param_state['old_g'] = p.grad.clone()
                 param_state['e_w'] = e_w.clone()
         if zero_grad: self.zero_grad()
 
@@ -36,6 +37,8 @@ class SAM(torch.optim.Optimizer):
         step = self.state['step']
         if (step + 1) % 352:
             self.second_grad_norm = self._grad_norm()
+            self.ratio_new_over_old = 0
+            self.sign_prod_new_old = 0
         for group in self.param_groups:
             weight_decay = group["weight_decay"]
             step_size = group['lr']
@@ -43,6 +46,11 @@ class SAM(torch.optim.Optimizer):
             for p in group['params']:
                 if p.grad is None: continue
                 param_state = self.state[p]
+                
+                if (step + 1) % 352:
+                    param_state['ratio_new_over_old'] = p.grad.div(param_state['old_g'].add(1e-8))
+                    self.ratio_new_over_old += torch.sum( param_state['ratio_new_over_old'].abs() > 1 )
+                    self.sign_prod_new_old += torch.sum( param_state['ratio_new_over_old'] > 0 )
                 
                 d_p = p.grad.data
                 

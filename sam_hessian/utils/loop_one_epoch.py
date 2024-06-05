@@ -59,7 +59,11 @@ def loop_one_epoch(
             except: pass
             
             try: 
-                logging_dict[(f'{loop_type.title()}/d_t_grad_norm', batch_idx)] = [optimizer.d_t_grad_norm, len(dataloader)]
+                logging_dict[(f'{loop_type.title()}/ratio_new_over_old', batch_idx)] = [optimizer.ratio_new_over_old, len(dataloader)]
+            except: pass
+            
+            try: 
+                logging_dict[(f'{loop_type.title()}/sign_prod_new_old', batch_idx)] = [optimizer.ratio_new_over_old, len(dataloader)]
             except: pass
                      
             try: 
