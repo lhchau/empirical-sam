@@ -98,12 +98,10 @@ The gradient magnitude is rescaled with weight $I + \rho \nabla_{B}^2 L(w_t)$.
 ## Cite this repository
 If you use this insight in your research, please cite our work:
 ```bibtex
-@misc{empirical2024sam,
-  author = {Hoang-Chau Luong},
-  title = {Empirical Study on Sharpness-Aware Minimization (SAM)},
-  year = {2024},
-  publisher = {GitHub},
-  journal = {GitHub repository},
-  howpublished = {\url{https://github.com/lhchau/empirical-sam}},
-}
+@techreport{Luong_Empirical_Study_on_2024,
+author = {Luong, Hoang-Chau},
+month = jun,
+title = {{Empirical Study on Sharpness-Aware Minimization}},
+url = {https://github.com/lhchau/empirical-sam},
+year = {2024}}
 ```
