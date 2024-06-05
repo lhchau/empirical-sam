@@ -8,12 +8,12 @@ preferred-citation:
   authors:
   - family-names: Luong
     given-names: Hoang-Chau
-date-released: "2024-06-05"
-keywords:
-  - research
-  - "Sharpness-Aware Minimization"
-  - "training dynamics"
-license: Apache-2.0
-message: If you use this insight in your research, please cite our work.
-repository-code: "https://github.com/lhchau/empirical-sam"
-title: "Empirical Study on Sharpness-Aware Minimization"
+  date-released: "2024-06-05"
+  keywords:
+    - research
+    - "Sharpness-Aware Minimization"
+    - "training dynamics"
+  license: Apache-2.0
+  message: If you use this insight in your research, please cite our work.
+  repository-code: "https://github.com/lhchau/empirical-sam"
+  title: "Empirical Study on Sharpness-Aware Minimization"
