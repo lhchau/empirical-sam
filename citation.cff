@@ -4,11 +4,14 @@ authors:
     given-names: Hoang-Chau
     orcid: ""
 cff-version: 1.2.0
+preferred-citation: 
+  type: report
 date-released: "2024-06-05"
 keywords:
   - research
   - "Sharpness-Aware Minimization"
   - "training dynamics"
+license: Apache-2.0
 message: If you use this insight in your research, please cite our work.
 repository-code: "https://github.com/lhchau/empirical-sam"
 title: "Empirical Study on Sharpness-Aware Minimization"
