@@ -95,8 +95,9 @@ The gradient magnitude is rescaled with weight $I + \rho \nabla_{B}^2 L(w_t)$.
 - How does this preconditioning help in finding flat minima?
 - How can we enhance the SAM trajectory based on these observations?
 
-### Citation
-```
+## Cite this repository
+If you use this insight in your research, please cite our work:
+```bibtex
 @misc{empirical2024sam,
   author = {Hoang-Chau Luong},
   title = {Empirical Study on Sharpness-Aware Minimization (SAM)},
