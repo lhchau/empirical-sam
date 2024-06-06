@@ -36,7 +36,7 @@ Our investigation focuses on which of these components has a more significant im
 
 #### Flatness Results (ResNet-18)
 
-| Flatness (ResNet-18) | $\rho=0.1$ | $\rho=0.2$ | $\rho=0.4$ |
+| Sharpness (ResNet-18) | $\rho=0.1$ | $\rho=0.2$ | $\rho=0.4$ |
 |----------------------|--------------|--------------|--------------|
 | SAM                  | 71.04        | 56.53        | 52.23        |
 | SAMDIRECTION         | 259.27       | 3737.54      | 1254.17      |
@@ -86,6 +86,25 @@ $$
 $$
 
 The gradient magnitude is rescaled with weight $I + \rho \nabla_{B}^2 L(w_t)$.
+
+### Quick Check for Intuition
+
+We introduce an SGD variant named SGDHESS, derived from the following intuition:
+$$
+w_{t+1} = w_t - \eta \nabla L(w_t) (I + \rho \nabla_{B}^2 L(w_t))
+$$ 
+For efficient computation, we use the Gauss-Newton approximation $G$ for $\nabla_{B}^2 L(w_t)$. This implementation is based on [AdaHessian](https://github.com/amirgholami/adahessian).
+
+The results demonstrate that modifying the magnitude of the gradient $\nabla L(w_t)$ by considering the Hessian $\nabla_{B}^2 L(w_t)$ can lead to finding flatter minima.
+
+| Flatness (ResNet-18) | Accuracy     | Sharpness    |
+|----------------------|--------------|--------------|
+| SGD                  | 77.36%       | 207.06       |
+| SGDHESS ($\rho = 0.05$) | 77.27%   | 192.45       |
+| SGDHESS ($\rho = 1$)    | 76.75%   | 151.62       |
+| SGDHESS ($\rho = 2$)    | 75.96%   | 138.62       |
+
+However, the test accuracy of SGDHESS is lower than that of SGD. This phenomenon suggests that the actual SAM update does not only reduce sharpness.
 
 ## Conclusion
 - This project demonstrates that the gradient magnitude of SAM primarily contributes to its ability to find flat minima.
