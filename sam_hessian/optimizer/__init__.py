@@ -1,7 +1,8 @@
+from .sgd import SGD
 from .sam import SAM
 from .samdirection import SAMDIRECTION
 from .sammagnitude import SAMMAGNITUDE
-from .samhess import SAMHESS
+from .sgdhess import SGDHESS
 
 def get_optimizer(
     net,
@@ -9,6 +10,11 @@ def get_optimizer(
     opt_hyperparameter={}):
     if opt_name == 'sam':
         return SAM(
+            net.parameters(), 
+            **opt_hyperparameter
+        )
+    elif opt_name == 'sgd':
+        return SGD(
             net.parameters(), 
             **opt_hyperparameter
         )
@@ -23,7 +29,7 @@ def get_optimizer(
             **opt_hyperparameter
         )
     elif opt_name == 'samhess':
-        return SAMHESS(
+        return SGDHESS(
             net.parameters(), 
             **opt_hyperparameter
         )

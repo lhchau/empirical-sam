@@ -2,22 +2,23 @@ import torch
 import numpy as np
 
 
-class SAMHESS(torch.optim.Optimizer):
-    def __init__(self, params, adaptive=False, rho=0.05, **kwargs):
+class SGDHESS(torch.optim.Optimizer):
+    def __init__(self, params, adaptive=False, rho=0.05, k=1, **kwargs):
         assert rho >= 0.0, f"Invalid rho, should be non-negative: {rho}"
 
         defaults = dict(rho=rho, adaptive=adaptive, **kwargs)
-        super(SAMHESS, self).__init__(params, defaults)
+        super(SGDHESS, self).__init__(params, defaults)
         self.beta2 = 0.9
-        self.k = 10
-        self.eps = 1e-8
+        self.k = k
         self.state['step'] = 0
 
     @torch.no_grad()
-    def first_step(self, zero_grad=False):   
+    def first_step(self, zero_grad=False):
         self.state['step'] += 1
         step = self.state['step']
-        
+        if (step + 1) % 352 or step == 1:
+            self.second_grad_norm = self._grad_norm()
+            
         if (step + 1) % self.k == 0 or step == 1:
             params = []
             grads = []
@@ -34,54 +35,18 @@ class SAMHESS(torch.optim.Optimizer):
                     if p.grad is None: continue
                     param_state = self.state[p]
                     
-                    if 'exp_hessian_diag_sq' not in param_state:
-                        param_state['exp_hessian_diag_sq'] = torch.zeros_like(p, memory_format=torch.preserve_format)
-                    param_state['exp_hessian_diag_sq'].mul_(self.beta2).addcmul_(
-                        hut_trace, hut_trace.conj(), value=1 - self.beta2
-                    ) 
-                    param_state['exp_hessian_diag'] = param_state['exp_hessian_diag_sq'].sqrt()
-            self.hessian_norm = self._grad_norm(by='exp_hessian_diag')
-            
-        for group in self.param_groups:
-            for p in group['params']:
-                if p.grad is None: continue
-                param_state = self.state[p]
-                
-                param_state['d_t'] = p.grad.div(param_state['exp_hessian_diag'].sqrt().add(self.eps))
-        if (step + 1) % 352:
-            self.weight_norm = self._weight_norm()
-            self.first_grad_norm = self._grad_norm()
-             
-        self.d_t_grad_norm = self._grad_norm('d_t')
-        for group in self.param_groups:
-            scale = group['rho'] / (self.d_t_grad_norm + self.eps)
-            for p in group['params']:
-                if p.grad is None: continue
-                param_state = self.state[p]
-                
-                e_w = (torch.pow(p, 2) if group['adaptive'] else 1.0) * param_state['d_t'] * scale.to(p)
-                p.add_(e_w)  # climb to the local maximum "w + e(w)"
-                
-                param_state['e_w'] = e_w.clone()
-        
-        if zero_grad: self.zero_grad()
-
-    @torch.no_grad()
-    def second_step(self, zero_grad=False):
-        step = self.state['step']
-        if (step + 1) % 352:
-            self.second_grad_norm = self._grad_norm()
+                    param_state['hessian_diag'] = hut_trace
+                    
         for group in self.param_groups:
             weight_decay = group["weight_decay"]
             step_size = group['lr']
             momentum = group['momentum']
+            rho = group['rho']
             for p in group['params']:
                 if p.grad is None: continue
                 param_state = self.state[p]
                 
-                d_p = p.grad.data
-                
-                p.sub_(param_state['e_w'])  # get back to "w" from "w + e(w)"
+                d_p = p.grad.data + p.grad.mul(param_state['hessian_diag'] * rho)
                 
                 if weight_decay != 0:
                     d_p.add_(p.data, alpha=weight_decay)
