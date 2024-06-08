@@ -55,6 +55,7 @@ Sharpness-Aware Minimization (SAM) aims to address the issue of sharp minima. Sh
 SAM modifies the loss function to penalize sharp minima: $L^{SAM}(w_t) = \max_{ || \epsilon || \leq \rho } L(w_t + \epsilon)$
 
 To solve this objective function, SAM proposed the update rule as:
+
 $$
 w_{t+1} = w_t - \eta \nabla L(w_t + \rho \frac{ \nabla L(w_t) }{ || \nabla L(w_t) || })
 $$
