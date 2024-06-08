@@ -1,5 +1,19 @@
 # Empirical Study on Sharpness-Aware Minimization (SAM)
 
+## Table of Contents
+1. [Research Question](#research-question)
+2. [Optimization Background](#optimization-background)
+    - [Basic Concepts](#basic-concepts)
+    - [Stochasitc Gradient Descent](#stochasitc-gradient-descent)
+    - [Challenges in Optimization](#challenges-in-optimization)
+    - [Sharpness-Aware Minimization (SAM)](#sharpness-aware-minimization-sam)
+3. [Experiments](#experiments)
+4. [Observations and Reproducibility](#observations-and-reproducibility)
+5. [Intuition from Update Rule](#intuition-from-update-rule)
+6. [Conclusion](#conclusion)
+    - [Further Questions](#further-questions)
+7. [Cite this repository](#cite-this-repository)
+
 ## Research Question: 
 **Between the magnitude and direction of the gradient, which is more important to SAM?**
 
@@ -8,6 +22,42 @@ We decompose a gradient vector into two components:
 - **Magnitude:** $|\nabla L(w_t)|$
 
 Our investigation focuses on which of these components has a more significant impact on the success of SAM.
+
+## Optimization Background
+
+Optimization plays a critical role in training deep learning models. Two techniques we discuss here are Stochastic Gradient Descent (SGD) and Sharpness-Aware Minimization (SAM).
+
+### Basic Concepts
+
+Optimization in the context of machine learning refers to the process of adjusting the parameters of a model to minimize (or maximize) an objective function, often referred to as the loss function. The goal is to find the parameter values that result in the best performance of the model on a given task.
+
+### Stochastic Gradient Descent (SGD)
+
+SGD is a fundamental optimization algorithm used to minimize the loss function. The key idea is to iteratively adjust the model parameters in the direction opposite to the gradient of the loss function with respect to the parameters. This process is repeated until convergence.
+
+The update rule for stochastic gradient descent is given by:
+$w_{t+1} = w_t - \eta \nabla L(w_t)$
+where:
+- $w_t$ are the model parameters at iteration $t$,
+- $\eta$ is the learning rate,
+- $\nabla L(w_t)$ is the gradient of the loss function with respect to $w_t$.
+
+### Challenges in Optimization
+
+- **Local Minima**: Optimization algorithms can get stuck in local minima, especially in non-convex loss landscapes.
+- **Saddle Points**: Points where the gradient is zero but are not minima can slow down optimization.
+- **Sharp Minima**: Solutions where the loss function has steep curves can lead to poor generalization on new data.
+
+### Sharpness-Aware Minimization (SAM)
+
+Sharpness-Aware Minimization (SAM) aims to address the issue of sharp minima. Sharp minima are regions where the loss function has steep slopes, which often correspond to poor generalization. SAM seeks to find flatter solutions that are robust to perturbations in the model parameters, leading to better generalization.
+
+SAM modifies the loss function to penalize sharp minima: $L^{SAM}(w_t) = \max_{ || \epsilon || \leq \rho } L(w_t + \epsilon)$
+
+To solve this objective function, SAM proposed the update rule as:
+$$
+w_{t+1} = w_t - \eta \nabla L(w_t + \rho \frac{ \nabla L(w_t) }{ || \nabla L(w_t) || })
+$$
 
 ## Experiments
 
@@ -81,7 +131,6 @@ $$
 \begin{align*}
 \eta \nabla_{B} L(w_t + \rho \nabla_{B} L(w_t)) &= \eta [\nabla_{B} L(w_t) + \rho \nabla_{B}^2 L(w_t) \nabla_{B} L(w_t)] \\
 &= \eta (I + \rho \nabla_{B}^2 L(w_t)) \nabla_{B} L(w_t) \\
-&= \eta (I + \rho \nabla_{B}^2 L(w_t)) (\nabla_{D} L(w_t) + \epsilon)
 \end{align*}
 $$
 
@@ -90,9 +139,11 @@ The gradient magnitude is rescaled with weight $I + \rho \nabla_{B}^2 L(w_t)$.
 ### Quick Check for Intuition
 
 We introduce an SGD variant named SGDHESS, derived from the following intuition:
+
 $$
 w_{t+1} = w_t - \eta \nabla L(w_t) (I + \rho \nabla_{B}^2 L(w_t))
-$$ 
+$$
+ 
 For efficient computation, we use the Gauss-Newton approximation $G$ for $\nabla_{B}^2 L(w_t)$. This implementation is based on [AdaHessian](https://github.com/amirgholami/adahessian).
 
 The results demonstrate that modifying the magnitude of the gradient $\nabla L(w_t)$ by considering the Hessian $\nabla_{B}^2 L(w_t)$ can lead to finding flatter minima.
