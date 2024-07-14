@@ -76,6 +76,24 @@ $$
 | SAMDIRECTION         | 77.89        | 78.52        | 78.22        |
 | SAMMAGNITUDE         | 78.73        | 79.23        | 77.94        |
 
+| Accuracy (ResNet-34) | $\rho=0.1$ | $\rho=0.2$ | $\rho=0.4$ |
+|----------------------|--------------|--------------|--------------|
+| SAM                  | ??        | 80.95        | 80.89        |
+| SAMDIRECTION         | 79.35        | 80.02        | 76.38        |
+| SAMMAGNITUDE         | 80.08        | 79.71        | 72.74        |
+
+| Accuracy (ResNet-50) | $\rho=0.1$ | $\rho=0.2$ | $\rho=0.4$ |
+|----------------------|--------------|--------------|--------------|
+| SAM                  | ??        | 81.24        | ??        |
+| SAMDIRECTION         | ??        | ??        | 80.34        |
+| SAMMAGNITUDE         | ??        | ??        | ??        |
+
+| Accuracy (WideResNet-28-10) | $\rho=0.1$ | $\rho=0.2$ | $\rho=0.4$ |
+|----------------------|--------------|--------------|--------------|
+| SAM                  | 83.50        | 83.91        | 83.44        |
+| SAMDIRECTION         | 82.44        | 82.54        | 82.11        |
+| SAMMAGNITUDE         | 82.47        | 80.63        | 79.36        |
+
 - **Experiment 1: SAMMAGNITUDE**
   - Maintains the SAM magnitude, replacing the direction with SGD direction.
   - The results approximate SAM performance.
