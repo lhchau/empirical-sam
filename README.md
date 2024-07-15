@@ -97,11 +97,17 @@ $$
 
 - **Experiment 1: SAMMAGNITUDE**
   - Maintains the SAM magnitude, replacing the direction with SGD direction.
-  - The results approximate SAM performance.
+  - ResNet18:
+    - The results approximate SAM performance.
+  - ResNet34, WideResNet28-10:
+    - The results are below SAM performance and very sensitive to perturbation radius $\rho$.
 
 - **Experiment 2: SAMDIRECTION**
   - Maintains the SAM direction, replacing the magnitude with SGD magnitude.
-  - The results differ significantly from SAM, with extremely sharp minima.
+  - ResNet18:
+    - The results differ significantly from SAM, with extremely sharp minima.
+  - ResNet34, WideResNet28-10:
+    - The results are below SAM, but less sensitive to perturbation radius $\rho$.
 
 #### Flatness Results (ResNet-18)
 
@@ -116,8 +122,7 @@ $$
   - We count the number of instances where the ratio of SAM update over SGD update is greater than one.
   - Results indicate that this ratio is over 50% during initial training and increases to 85% at later stages.
 
-## Observations and Reproducibility
-- **The gradient magnitude** is a crucial factor in determining the ability of SAM to find flat minima.
+## Reproducibility
 
 To reproduce our experiments, follow these steps:
 - Install the `wandb` package:
@@ -138,6 +143,8 @@ python sam_hessian/train.py --experiment=default_sam --opt_name=sammagnitude --r
 ```
 
 ## Intuition from Update Rule
+Inspired by the insight from SAMMAGNITUDE on ResNet18 that the magnitude correlates with flatness, we run experiments to confirm this behavior on the simpler optimizer.
+
 Considering the SAM update rule, we denote \( D \) as the gradient computed on the full batch, and \( B \) as the gradient computed on a mini-batch:
 
 $$
@@ -177,12 +184,14 @@ The results demonstrate that modifying the magnitude of the gradient $\nabla L(w
 However, the test accuracy of SGDHESS is lower than that of SGD. This phenomenon suggests that the actual SAM update does not only reduce sharpness.
 
 ## Conclusion
-- This project demonstrates that the gradient magnitude of SAM primarily contributes to its ability to find flat minima.
+- **The gradient magnitude** is a crucial factor in determining the ability of SAM to find flat minima in particular architecture such as **ResNet18**, whereas worse in other architectures such as **ResNet34, WideResNet28-10**.
+- Both **magnitude** and **direction** are important to SAM's ability.
 
 ### Further Questions
-- How can we mimic this preconditioning effect with only a single gradient computation?
-- How does this preconditioning help in finding flat minima?
-- How can we enhance the SAM trajectory based on these observations?
+- How magnitude affect SAM's ability? 
+  - SAMmagnitude/SGDmagnitude > 1?
+- How direction affect SAM's ability
+  - SAMmagnitude/SGDmagnitude < 0?
 
 ## Cite this repository
 If you use this insight in your research, please cite our work:
